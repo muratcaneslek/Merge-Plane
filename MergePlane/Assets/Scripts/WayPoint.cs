@@ -14,34 +14,34 @@ public class WayPoint : MonoBehaviour
     private float movementSpeed = 5.0f;  // public Level çarpaný gelicek
     private float rotationSpeed = 1.0f;
 
+
     void Start()
     {
         lastWaypointIndex = waypoints.Count - 1;
         targetWaypoint = waypoints[targetWaypointIndex];
         carStatus = false;
+        
     }
 
     void Update()
     {
-        float movementStep = movementSpeed * Time.deltaTime;
-        float rotationStep = rotationSpeed * Time.deltaTime;
+            carStatus = true;
+            float movementStep = movementSpeed * Time.deltaTime;
+            float rotationStep = rotationSpeed * Time.deltaTime;
 
-        Vector2 directionToTarget = targetWaypoint.position - transform.position;
-        if (directionToTarget != Vector2.zero)
-        {
-            var neededRotation = Quaternion.LookRotation(Vector3.forward, directionToTarget);
-            transform.rotation = Quaternion.Slerp(transform.rotation, neededRotation, rotationSpeed * Time.deltaTime);
-        }
+            Vector2 directionToTarget = targetWaypoint.position - transform.position;
+            if (directionToTarget != Vector2.zero)
+            {
+                var neededRotation = Quaternion.LookRotation(Vector3.forward, directionToTarget);
+                transform.rotation = Quaternion.Slerp(transform.rotation, neededRotation, rotationSpeed * Time.deltaTime);
+            }
 
-        if (carStatus == true)
-        {
-            float distance = Vector3.Distance(transform.position, targetWaypoint.position);
-            CheckDistanceToWaypoint(distance);
-            transform.position = Vector3.MoveTowards(transform.position, targetWaypoint.position, movementStep);
-        }
-        
-
-       
+            if (carStatus == true)
+            {
+                float distance = Vector3.Distance(transform.position, targetWaypoint.position);
+                CheckDistanceToWaypoint(distance);
+                transform.position = Vector3.MoveTowards(transform.position, targetWaypoint.position, movementStep);
+            }
     }
 
     /// <param name="currentDistance">The enemys current distance from the waypoint</param>
