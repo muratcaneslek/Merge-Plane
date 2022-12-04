@@ -60,6 +60,10 @@ public class PlaneInfos : MonoBehaviour
         return level * 5;
     }
 
+    public PlaneData[] GetPlaneDatas()
+    {
+        return planeDatas;
+    }
 
     
 
