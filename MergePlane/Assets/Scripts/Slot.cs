@@ -20,7 +20,7 @@ public class Slot : MonoBehaviour, IDropHandler
     {
         if (!item)
         {
-            DragHandeler.itemBeingDragged.transform.SetParent(transform);
+            //DragHandeler.itemBeingDragged.transform.SetParent(transform);
         }
     }
 }

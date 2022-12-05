@@ -3,34 +3,61 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class DragHandeler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class DragHandeler : MonoBehaviour
 {
-    public static GameObject itemBeingDragged;
-    Vector3 StartPosition;
-    Transform StartParent;
+  
+    [SerializeField] private float touchRadius;
+    [SerializeField] private LayerMask whatIsDragable;
+    public GameObject itemBeingDragged;
 
 
-    public void OnBeginDrag(PointerEventData eventData)
+    void Update()
     {
-        itemBeingDragged = gameObject;
-        StartPosition = transform.position;
-        StartParent = transform.parent;
-        GetComponent<CanvasGroup>().blocksRaycasts = false;
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        transform.position = Input.mousePosition;
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        itemBeingDragged = null;
-        GetComponent<CanvasGroup>().blocksRaycasts = true;
-        if (transform.parent == StartParent)
+        if(Input.touchCount > 0)
         {
-            transform.position = StartPosition;
+            var touch = Input.GetTouch(0);
+            var touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
+
+            if(touch.phase == TouchPhase.Began) // player started touch
+            {
+                
+                var hit = Physics2D.OverlapCircle(touchPosition, touchRadius, whatIsDragable);
+                
+                if(hit.TryGetComponent<IDragable>(out var dragable))
+                {
+                    dragable.OnTouch(this);
+                }
+
+            }
         }
 
+        if(Input.GetMouseButtonDown(0))
+        {
+            var clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            var hit = Physics2D.OverlapCircle(clickPosition, touchRadius, whatIsDragable);
+            if(hit)
+            {
+                if(hit.TryGetComponent<IDragable>(out var dragable))
+                {
+                    dragable.OnTouch(this);
+                }
+            }
+        }
+        if(Input.GetMouseButton(0))
+        {
+            if(itemBeingDragged)
+            {
+                var clickedPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                itemBeingDragged.transform.position = new Vector3(clickedPos.x, clickedPos.y, 0);
+            }
+        }
+        if(Input.GetMouseButtonUp(0))
+        {
+            if(itemBeingDragged)
+            {
+                itemBeingDragged.GetComponent<IDragable>().OnTouchEnd(this);
+                itemBeingDragged = null;
+            }
+        }
     }
 }

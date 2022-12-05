@@ -60,8 +60,7 @@ public class PlaneGround : MonoBehaviour
     {
         ghostPlaneSprite.enabled = false;
         triggerBox.enabled = false;
-        // stop plane movement
-        plane.transform.position = planeTransform.position;
+        plane.MoveBackToGround();
     }
 
     // return ground has a plane or not

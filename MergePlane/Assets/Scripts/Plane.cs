@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections;
 
-public class Plane : MonoBehaviour
+public class Plane : MonoBehaviour, IDragable
 {
     [SerializeField] private SpriteRenderer spriteRenderer;
     // movement component
@@ -17,8 +18,16 @@ public class Plane : MonoBehaviour
 
     // The Ground that The Plane is currently on
     private PlaneGround planeGround;
+    private PlaneMovement planeMovement;
+
+    [SerializeField] private LayerMask whatIsStart;
 
     public UnityEvent OnLevelUp;
+
+    void Awake()
+    {
+        planeMovement = GetComponent<PlaneMovement>();
+    }
 
 
 
@@ -45,9 +54,54 @@ public class Plane : MonoBehaviour
 
     public void StartMove()
     {
-        // movement.move;
-
-        // WayPoint.move = true;
+        planeMovement.StartMovement();
+        if(planeGround)
+        {
+            planeGround.OnPlaneMovementStart();
+        }
+    }
+    private void StopMove()
+    {
+        planeMovement.StopMovement();
     }
 
+    public void OnTouch(DragHandeler dragHandeler) // on mouse click or touch
+    {
+        if(!planeMovement.move) // if plane is not moving
+        {
+            dragHandeler.itemBeingDragged = gameObject; // set clicked object to this gameobject
+        }
+    }
+
+    public void OnTouchEnd(DragHandeler dragHandeler) // on mouse click or touch ENDED
+    {
+        var hit = Physics2D.OverlapCircle(transform.position, 0.3f, whatIsStart); // check last position
+        if(hit) // if plane is on start position
+        {
+            StartMove();
+        }
+        else // if not turn back to ground
+        {
+            MoveBackToGround();
+        }
+    }
+
+    public void MoveBackToGround() // stops movement and moves back to ground
+    {
+        if(planeGround)
+        {
+            StopMove();
+            StartCoroutine(GetBackToGround());
+        }
+    }
+
+    IEnumerator GetBackToGround()
+    {
+        var destination = planeGround.transform.position - transform.position;
+        while(destination.magnitude > 0.1f)
+        {
+            transform.position += destination.normalized * Time.deltaTime * 5;
+            yield return new WaitForSeconds(0);
+        }
+    }
 }
