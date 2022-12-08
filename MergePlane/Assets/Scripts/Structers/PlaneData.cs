@@ -10,5 +10,6 @@ public struct PlaneData
     public string name;
     [Header("Market")]
     public Image marketImage;
-    public Price[] marketPrices;
+    public int goldPrice;
+    public int diamondPrice;
 }
