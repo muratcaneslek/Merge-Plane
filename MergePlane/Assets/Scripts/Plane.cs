@@ -21,6 +21,7 @@ public class Plane : MonoBehaviour, IDragable
     private PlaneMovement planeMovement;
 
     [SerializeField] private LayerMask whatIsStart;
+    [SerializeField] private LayerMask whatIsGround;
 
     public UnityEvent OnLevelUp;
 
@@ -76,11 +77,16 @@ public class Plane : MonoBehaviour, IDragable
     public void OnTouchEnd(DragHandeler dragHandeler) // on mouse click or touch ENDED
     {
         var hit = Physics2D.OverlapCircle(transform.position, 0.3f, whatIsStart); // check last position
+        var ground = Physics2D.OverlapCircle(transform.position, 0.3f, whatIsGround);
         if(hit) // if plane is on start position
         {
             StartMove();
         }
-        else // if not turn back to ground
+        else if(ground && ground.TryGetComponent<PlaneGround>(out var planeGround) && planeGround.IsEmpty()) // if it is a ground and it is empty
+        {
+            planeGround.SetPlane(this);
+        }
+        else    // if not turn back to ground
         {
             MoveBackToGround();
         }
@@ -95,13 +101,25 @@ public class Plane : MonoBehaviour, IDragable
         }
     }
 
+    public bool IsMoving()
+    {
+        return planeMovement.move;
+    }
+
     IEnumerator GetBackToGround()
     {
-        var destination = planeGround.transform.position - transform.position;
-        while(destination.magnitude > 0.1f)
+        var timer = 0f;
+        while(transform.position != planeGround.transform.position)
         {
-            transform.position += destination.normalized * Time.deltaTime * 5;
+            transform.position = Vector3.Lerp(transform.position, planeGround.transform.position, timer);
+            transform.rotation = Quaternion.Euler(Vector3.Lerp(transform.rotation.eulerAngles, Vector3.zero, timer));
+            timer += Time.deltaTime;
             yield return new WaitForSeconds(0);
         }
+    }
+
+    public void SetGround(PlaneGround planeGround)
+    {
+        this.planeGround = planeGround;
     }
 }

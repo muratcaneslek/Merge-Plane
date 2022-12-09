@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class PlaneGround : MonoBehaviour
+public class PlaneGround : MonoBehaviour, IDragable
 {
     public Plane plane;
 
@@ -16,7 +16,6 @@ public class PlaneGround : MonoBehaviour
 
     [Header("Position")]
     [SerializeField] private SpriteRenderer ghostPlaneSprite;
-    [SerializeField] private Transform planeTransform;
 
     void Awake()
     {
@@ -30,8 +29,9 @@ public class PlaneGround : MonoBehaviour
     {
         if(!isLocked)
         {
+            plane.SetGround(this);
             triggerBox.enabled = false;
-            plane.transform.position = planeTransform.position;
+            plane.transform.position = transform.position;
             ghostPlaneSprite.sprite = plane.planeData.sprite;
             this.plane = plane;
         }
@@ -66,14 +66,19 @@ public class PlaneGround : MonoBehaviour
     // return ground has a plane or not
     public bool IsEmpty()
     {
-        return plane;
+        return !plane;
+    }
+
+    public bool IsLocked()
+    {
+        return isLocked;
     }
 
 
     // on player touch
     // try to unlock if ground locked
     // try to call plane back if ground unlocked and has a plane
-    public void OnTouched()
+    private void OnTouched()
     {
         if(isLocked)
         {
@@ -87,7 +92,7 @@ public class PlaneGround : MonoBehaviour
         {
             if(!IsEmpty())
             {
-                if(true) // check is plane moving
+                if(plane.IsMoving()) // check is plane moving
                 {
                     CallBackPlane();
                 }
@@ -109,4 +114,13 @@ public class PlaneGround : MonoBehaviour
         }
     }
 
+    public void OnTouch(DragHandeler dragHandeler)
+    {
+        OnTouched();
+    }
+
+    public void OnTouchEnd(DragHandeler dragHandeler)
+    {
+        
+    }
 }
