@@ -11,7 +11,7 @@ public class Plane : MonoBehaviour, IDragable
 
     public PlaneData planeData {get;  private set;} 
     public float speed {get;  private set;} 
-    public float goldPerTour {get;  private set;} 
+    public long goldPerTour {get;  private set;} 
 
     # endregion
 
@@ -33,14 +33,14 @@ public class Plane : MonoBehaviour, IDragable
 
 
     // Refresh plane datas (like speed, sprite, etc.) by parameters
-    public void SetDatas(PlaneData data, float speed, float goldPT)
+    public void SetDatas(PlaneData data, float speed, long goldPT)
     {
         this.planeData = planeData;
         this.speed = speed;
         this.goldPerTour = goldPT;
 
         spriteRenderer.sprite = planeData.sprite;
-        // set movement speed
+        planeMovement.speed = speed;
     }
 
     // Refresh plane datas (like speed, sprite, etc.) by using next level datas

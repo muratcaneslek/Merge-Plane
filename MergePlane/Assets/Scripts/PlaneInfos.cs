@@ -55,7 +55,7 @@ public class PlaneInfos : MonoBehaviour
         return level * 2;
     }
 
-    public float GetGoldPerTour(int level)
+    public long GetGoldPerTour(int level)
     {
         return level * 5;
     }
